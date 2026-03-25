@@ -1,0 +1,12 @@
+# Never commit real secrets
+# config.json contains placeholder values — real values are injected by GitHub Actions
+# If you hardcode real keys locally, add config.json here:
+# config.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
