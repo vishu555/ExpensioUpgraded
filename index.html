@@ -418,18 +418,17 @@ pre{font-size:.65rem;color:var(--mid);line-height:1.85;background:var(--s3);bord
 /* ════ MOBILE ════════════════════════════════════ */
 @media(max-width:640px){
   /* ── Header ── */
-  header{height:auto;min-height:auto;padding:.5rem .8rem;flex-wrap:wrap;gap:.35rem;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+  header{height:auto;min-height:auto;padding:.5rem .8rem;display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.2)}
   header nav{display:none}
-  .logo{font-size:1rem;color:#ffffff !important;letter-spacing:.04em}
+  /* Row 1: logo(flex:1) · plan-badge · hdr-user */
+  .logo{font-size:1rem;color:#ffffff !important;letter-spacing:.04em;flex:1;min-width:0}
   .logo-sub{display:none}
-  /* ── Header top row: logo left, badge+user right ── */
-  header{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center}
-  .logo{grid-column:1;grid-row:1}
-  .hdr-right{grid-column:1/-1;grid-row:2;width:100%;gap:.4rem;flex-direction:row;align-items:center;flex-wrap:wrap}
-  #plan-badge{grid-column:2;grid-row:1;margin-left:.5rem}
-  .hdr-user{grid-column:3;grid-row:1}
+  #plan-badge{flex-shrink:0}
+  .hdr-user{flex-shrink:0}
+  /* Row 2: hdr-right full width */
+  .hdr-right{width:100%;display:flex;align-items:center;gap:0}
   .hdr-right>.btn-save{display:none}
-  .fin-bar{
+  .fin-bar{flex:1;min-width:0;
     display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;
     background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
     border-radius:10px;overflow:hidden;backdrop-filter:blur(8px);
@@ -789,21 +788,21 @@ pre{font-size:.65rem;color:var(--mid);line-height:1.85;background:var(--s3);bord
 #paywall-overlay.open{display:flex}
 .paywall-card{
   background:var(--s1);border-radius:24px;padding:2rem 1.8rem;
-  width:100%;max-width:460px;max-height:90vh;overflow-y:auto;overflow-x:visible;
+  width:100%;max-width:460px;max-height:90vh;overflow-y:auto;
   box-shadow:0 24px 64px rgba(0,0,0,.3);animation:fadeUp .35s ease;
 }
 .paywall-header{text-align:center;margin-bottom:1.5rem}
 .paywall-icon{font-size:3rem;margin-bottom:.5rem}
 .paywall-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--txt);margin-bottom:.4rem}
 .paywall-sub{font-size:.78rem;color:var(--mid);line-height:1.6}
-.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.4rem 0;padding-top:.8rem;overflow:visible}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.4rem 0}
 .plan-card{border:2px solid var(--border);border-radius:16px;padding:1.2rem;cursor:pointer;
-  transition:all .2s;position:relative}
+  transition:all .2s}
 .plan-card:hover{border-color:var(--acc);transform:translateY(-2px)}
 .plan-card.recommended{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 6%,var(--s1))}
-.plan-badge-rec{position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+.plan-badge-rec{display:block;text-align:center;
   background:var(--acc);color:#fff;font-size:.58rem;padding:2px 10px;border-radius:20px;
-  font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap}
+  font-family:'Syne',sans-serif;font-weight:700;white-space:nowrap;margin:-4px auto 8px}
 .plan-name{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;margin-bottom:.4rem}
 .plan-price{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;color:var(--acc);line-height:1}
 .plan-price small{font-size:.65rem;font-weight:400;color:var(--mid)}
@@ -900,8 +899,9 @@ pre{font-size:.65rem;color:var(--mid);line-height:1.85;background:var(--s3);bord
       </div>
     </div>
     <button class="btn-save" style="font-size:.62rem;padding:7px 14px;white-space:nowrap;background:rgba(255,255,255,.22);color:#ffffff;border:1.5px solid rgba(255,255,255,.4);font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.04em;backdrop-filter:blur(8px)" onclick="openFinModal()">💰 Income &amp; Budget</button>
-    <span id="plan-badge" class="trial" onclick="openPaywall()">Trial</span>
-    <div class="hdr-user">
+  </div>
+  <span id="plan-badge" class="trial" onclick="openPaywall()">Trial</span>
+  <div class="hdr-user">
       <button class="user-menu-btn" id="user-avatar-btn" onclick="toggleUserMenu()">👤</button>
       <div id="user-dropdown">
         <div class="user-info">
@@ -3399,7 +3399,7 @@ async function signInWithGoogle() {
     return;
   }
   if (!_fbReady || !_auth) {
-    toast('Auth not ready — ensure all FIREBASE secrets are set in GitHub / Netlify and the site is redeployed', 'er');
+    toast('Firebase not initialised — check your secrets in GitHub Actions / Netlify and redeploy', 'er');
     return;
   }
   _showSpinner('Opening Google sign-in…');
@@ -3999,13 +3999,13 @@ document.addEventListener('DOMContentLoaded', () => {
         <strong>⚠ Serving as local file</strong><br>
         Google sign-in requires HTTP. Choose one:<br>
         1. Run: <code style="background:#fde68a;padding:1px 5px;border-radius:3px">npx serve .</code> → open <strong>localhost:3000</strong><br>
-        2. Deploy to <strong>Netlify</strong> (free, drag &amp; drop)
+        2. Deploy to <strong>GitHub Pages</strong> or <strong>Netlify</strong>
       </div>
 
       <div class="auth-note">
         By continuing you agree to our Terms of Service &amp; Privacy Policy.
       </div>
-      <div id="auth-demo-row" style="display:none;margin-top:.8rem;text-align:center">
+      <div id="auth-demo-row" style="display:block;margin-top:.8rem;text-align:center">
         <button onclick="enterDemoFromScreen()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:.68rem;cursor:pointer;text-decoration:underline;padding:4px">
           Continue without login (demo mode)
         </button>
