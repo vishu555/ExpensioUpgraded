@@ -422,8 +422,12 @@ pre{font-size:.65rem;color:var(--mid);line-height:1.85;background:var(--s3);bord
   header nav{display:none}
   .logo{font-size:1rem;color:#ffffff !important;letter-spacing:.04em}
   .logo-sub{display:none}
-  /* ── Header fin-bar: full-width pill, 3 equal cols ── */
-  .hdr-right{width:100%;gap:.4rem;flex-direction:column;align-items:stretch}
+  /* ── Header top row: logo left, badge+user right ── */
+  header{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center}
+  .logo{grid-column:1;grid-row:1}
+  .hdr-right{grid-column:1/-1;grid-row:2;width:100%;gap:.4rem;flex-direction:row;align-items:center;flex-wrap:wrap}
+  #plan-badge{grid-column:2;grid-row:1;margin-left:.5rem}
+  .hdr-user{grid-column:3;grid-row:1}
   .hdr-right>.btn-save{display:none}
   .fin-bar{
     display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;
@@ -785,14 +789,14 @@ pre{font-size:.65rem;color:var(--mid);line-height:1.85;background:var(--s3);bord
 #paywall-overlay.open{display:flex}
 .paywall-card{
   background:var(--s1);border-radius:24px;padding:2rem 1.8rem;
-  width:100%;max-width:460px;max-height:90vh;overflow-y:auto;
+  width:100%;max-width:460px;max-height:90vh;overflow-y:auto;overflow-x:visible;
   box-shadow:0 24px 64px rgba(0,0,0,.3);animation:fadeUp .35s ease;
 }
 .paywall-header{text-align:center;margin-bottom:1.5rem}
 .paywall-icon{font-size:3rem;margin-bottom:.5rem}
 .paywall-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--txt);margin-bottom:.4rem}
 .paywall-sub{font-size:.78rem;color:var(--mid);line-height:1.6}
-.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.4rem 0}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:1.4rem 0;padding-top:.8rem;overflow:visible}
 .plan-card{border:2px solid var(--border);border-radius:16px;padding:1.2rem;cursor:pointer;
   transition:all .2s;position:relative}
 .plan-card:hover{border-color:var(--acc);transform:translateY(-2px)}
@@ -3308,10 +3312,13 @@ async function initFirebase() {
   await loadConfig();
 
   // Not configured yet → demo mode (all features unlocked, no login)
+  const isGHP = location.hostname.endsWith('github.io');
   if (!_isConfigured() || _isLocal) {
     const why = _isLocal
-      ? 'Local file: deploy to Netlify or run: npx serve .'
-      : 'Firebase config not set — paste your config at the top of the script';
+      ? 'Local file: deploy to GitHub Pages or run: npx serve .'
+      : isGHP
+        ? 'Firebase config not loaded — ensure secrets are set in GitHub Actions and redeploy'
+        : 'Firebase config not set — paste your config at the top of the script';
     _enterDemoMode(why);
     return;
   }
@@ -3392,7 +3399,7 @@ async function signInWithGoogle() {
     return;
   }
   if (!_fbReady || !_auth) {
-    toast('Auth not ready — ensure all FIREBASE env vars are set in Netlify and the site is redeployed', 'er');
+    toast('Auth not ready — ensure all FIREBASE secrets are set in GitHub / Netlify and the site is redeployed', 'er');
     return;
   }
   _showSpinner('Opening Google sign-in…');
@@ -4026,7 +4033,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <!-- Free Trial -->
       <div class="plan-card" id="pc-trial">
         <div class="plan-name">Free Trial</div>
-        <div class="plan-price">₹0 <small>/ 30 days</small></div>
+        <div class="plan-price">₹0 <small>/ 1 day</small></div>
         <div class="plan-features">
           <div class="plan-feat included">Dashboard & Charts</div>
           <div class="plan-feat included">Add expenses (max 50)</div>
